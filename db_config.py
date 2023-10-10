@@ -1,3 +1,9 @@
+import os
+import datetime
+import logging
+from playhouse.db_url import connect
+from dotenv import load_dotenv
+from peewee import Model, IntegerField, CharField, TextField, TimestampField
 from peewee import *
 import datetime
 
@@ -8,7 +14,7 @@ class BaseModel(Model):
         database = database
 
 class User(BaseModel):
-    id = AutoField()
+    id = IntegerField(primary_key=True)
     name = CharField()
     email = CharField(unique=True)
     password = CharField()
@@ -23,7 +29,9 @@ class User(BaseModel):
     def get_id(self):
         return str(self.id)
 
-
+    @property
+    def is_authenticated(self):
+        return True  # Or your appropriate logic here
 class Reservation(BaseModel):
     id = AutoField()
     user = ForeignKeyField(User, backref='reservations')
