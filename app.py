@@ -1,33 +1,61 @@
-
 import os
-from flask_login import current_user
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from flask_mail import Mail, Message
 from werkzeug.security import generate_password_hash, check_password_hash
 from peewee import IntegrityError
-from db_config import User, Reservation
-from flask_mail import Mail, Message  # メール通知のため
+from datetime import datetime, timedelta, date
+from db_config import User, Reservation, Inventory
 
-app = Flask(__name__)  # appオブジェクトを作成
+
+app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-mail = Mail(app)  # ここにMailオブジェクトの初期化を移動
+app.config['MAIL_SERVER'] = 'smtp.example.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USERNAME'] = 'your-email@example.com'
+app.config['MAIL_PASSWORD'] = 'your-email-password'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
+mail = Mail(app)
+
+mail = Mail(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+def initialize_inventory(start_date, end_date):
+    current_date = start_date
+    while current_date <= end_date:
+        Inventory.create(date=current_date)
+        current_date += timedelta(days=1)
+
+def check_and_update_inventory(check_in_date, check_out_date):
+    query = Inventory.select().where(Inventory.date.between(check_in_date, check_out_date - timedelta(days=1)))
+    for inventory in query:
+        if inventory.available_rooms > 0:
+            inventory.available_rooms -= 1
+            inventory.save()
+        else:
+            raise ValueError(f"No rooms available on {inventory.date}")
 
 @app.route("/reserve", methods=["GET", "POST"])
 @login_required
 def reserve():
     if request.method == "POST":
-        check_in_date = request.form["check_in_date"]
-        check_out_date = request.form["check_out_date"]
-        # ... 在庫確認と予約処理
-        # メール通知
-        msg = Message("予約完了", recipients=[current_user.email])
-        msg.body = f"予約が完了しました。チェックイン日: {check_in_date}, チェックアウト日: {check_out_date}"
-        mail.send(msg)
-        return redirect(url_for("index"))
+        check_in_date = datetime.strptime(request.form["check_in_date"], '%Y-%m-%d').date()
+        check_out_date = datetime.strptime(request.form["check_out_date"], '%Y-%m-%d').date()
+        try:
+            check_and_update_inventory(check_in_date, check_out_date)
+            # ...その他の予約処理
+            # メール通知
+            msg = Message("予約完了", recipients=[current_user.email])
+            msg.body = f"予約が完了しました。チェックイン日: {check_in_date}, チェックアウト日: {check_out_date}"
+            mail.send(msg)
+            return redirect(url_for("index"))
+        except ValueError as e:
+            flash(str(e))
     return render_template("reservation.html")
 
 @app.route("/history")
@@ -36,11 +64,6 @@ def history():
     reservations = Reservation.select().where(Reservation.user == current_user)
     return render_template("history.html", reservations=reservations)
 
-
-app = Flask(__name__)
-app.secret_key = os.urandom(24)
-login_manager = LoginManager()
-login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -70,8 +93,8 @@ def register():
             login_user(user)
             flash(f"ようこそ！ {user.name} さん")
             return redirect(url_for("index"))
-        except IntegrityError:
-            flash("登録に失敗しました")
+        except IntegrityError as e:
+            flash(f"登録に失敗しました: {e}")
     return render_template("register.html")
 
 
@@ -85,7 +108,7 @@ def login():
             flash(f"ようこそ！ {user.name} さん")
             return redirect(url_for("index"))
         else:
-            flash("認証に失敗しました")
+            flash("認証に失敗しました: Emailまたはパスワードが間違っています")
     return render_template("login.html")
 
 
@@ -97,20 +120,54 @@ def logout():
     flash("ログアウトしました！")
     return redirect(url_for("index"))
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST" and current_user.is_authenticated:
-        Reservation.create(user=current_user, content=request.form["content"])  
-    messages = (
+        # 予約情報を取得
+        room_type = request.form["room_type"]
+        check_in_date = request.form["check_in_date"]
+        check_out_date = request.form["check_out_date"]
+        # その他の予約情報を取得...
+
+        # 何泊かを計算
+        number_of_stays = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
+
+        # 新しい予約をデータベースに保存
+        reservation = Reservation.create(
+            user=current_user,
+            room_type=room_type,
+            check_in_date=check_in_date,
+            check_out_date=check_out_date,
+            number_of_stays=number_of_stays,
+            # その他の予約情報...
+        )
+
+        # メール通知を送信
+        send_reservation_email(reservation)
+
+        flash("予約が完了しました!")
+        return redirect(url_for("index"))
+
+    # 予約履歴を取得
+    reservations = (
         Reservation.select()
-        .order_by(Reservation.pub_date.desc(), Reservation.id.desc())
+        .where(Reservation.user == current_user)
+        .order_by(Reservation.check_in_date.desc())
     )
-    return render_template("index.html", messages=messages)
+    return render_template("index.html", reservations=reservations)
+
+
+def send_reservation_email(reservation):
+    msg = Message("予約確認", recipients=[reservation.user.email])
+    msg.body = f"予約内容:\n部屋タイプ: {reservation.room_type}\nチェックイン日: {reservation.check_in_date}\nチェックアウト日: {reservation.check_out_date}\n何泊: {reservation.number_of_stays}\n"  # ...その他の情報
+    mail.send(msg)
+
 
 @app.route("/reservations/<reservation_id>/delete/", methods=["POST"])
 @login_required
 def delete(reservation_id):
-    if Reservation.select().where((Reservation.id == reservation_id) & (Reservation.user == current_user.id)).first():
+    if Reservation.select().where((Reservation.id == reservation_id) & (Reservation.user == current_user)).first():
         Reservation.delete_by_id(reservation_id)
     else:
         flash("無効な操作です")
@@ -118,3 +175,4 @@ def delete(reservation_id):
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug=True)
+

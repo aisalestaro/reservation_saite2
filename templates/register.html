@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
-        <h2>Register</h2>
-        <form action="{{ url_for('register') }}" method="post">
-            <div>Username:</div>
-            <div><input type="text" name="name"></div>
-            <div>Password:</div>
-            <div><input type="password" name="password"></div>
-            <div>Email:</div>
-            <div><input type="email" name="email"></div>
-            <input type="submit" value="Join">
-        </form>
+<h2>コンテナホテル 予約 〜Reservation〜</h2>
+{% for message in get_flashed_messages() %}
+<p class=error><strong>Error:</strong> {{ message }}</p>
+{% endfor %}
+<form action="{{ url_for('register') }}" method="post">
+    <div>Username:</div>
+    <div><input type="text" name="name" required></div>
+    <div>Password:</div>
+    <div><input type="password" name="password" required></div>
+    <div>Email:</div>
+    <div><input type="email" name="email" required></div>
+    <input type="submit" value="Create Account">
+</form>
 {% endblock %}

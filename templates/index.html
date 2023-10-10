@@ -1,36 +1,44 @@
 {% extends "base.html" %}
-{% block content%}
-{% if current_user.is_authenticated %} {# ログインしている場合に表示 #}
-<h2>Create</h2>
-<form action="{{ url_for('index') }}" method="post">
-    <div>Message:</div>
-    <div><textarea name="content" placeholder="今の気分はいかがですか？"></textarea></div>
-    <div><input type="submit" value="Create" /></div>
-</form>
-{% endif %}
 
-<h2>一覧</h2>
-<ul>
-    {% for message in messages %}
-    <div class="message">
-        <li>
-            <img src="http://www.gravatar.com/avatar/{{ message.user.email }}?d=identicon&s=80" alt="" class="avatar">
-            {{ message.user.name }} {{ message.pub_date }}
-            {% if message.user == current_user %}
-            <form action="{{ url_for('delete', message_id=message.id) }}" method="post" style="display:inline;">
-                <input type="submit" value="削除" onclick="if(!confirm('このメッセージを削除しますか？')) return false">
-            </form>
-            {% endif %}
-            <div class="message-content">
-                <a href="{{ url_for('show', message_id=message.id) }}">
-                    {{ message.content }}
-                </a>
-                {% if message.messages.count() > 0 %}
-                {{ message.messages.count() }}件の返信
-                {% endif %}
-            </div>
+{% block content %}
+<!-- Bootstrap CSSのリンクを追加 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<div class="container"> <!-- コンテナ divを追加 -->
+    {% if current_user.is_authenticated %} {# ログインしている場合に表示 #}
+    <h2 class="my-4">お部屋の予約 〜Reservation〜</h2> <!-- タイトルを変更 -->
+    <form action="{{ url_for('index') }}" method="post">
+        <div class="form-group">
+            <label for="room_type">客室タイプ:</label>
+            <select name="room_type" id="room_type" class="form-control">
+                <option value="double_room">ダブルルーム</option>
+                <!-- 他の部屋タイプオプションをここに追加... -->
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="check_in_date">チェックイン日:</label>
+            <input type="date" name="check_in_date" id="check_in_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="check_out_date">チェックアウト日:</label>
+            <input type="date" name="check_out_date" id="check_out_date" class="form-control" required>
+        </div>
+        <!-- 他の予約情報フィールドをここに追加... -->
+        <div class="form-group">
+            <input type="submit" value="予約" class="btn btn-primary"> <!-- Bootstrapボタンクラスを追加 -->
+        </div>
+    </form>
+
+    <h2 class="my-4">予約履歴</h2> <!-- タイトルを変更 -->
+    <ul class="list-group"> <!-- Bootstrapリストグループクラスを追加 -->
+        {% for reservation in reservations %}
+        <li class="list-group-item">
+            {{ reservation.room_type }} - {{ reservation.check_in_date }} to {{ reservation.check_out_date }} ({{
+            reservation.number_of_stays }}泊) <!-- 泊数の表記を日本語に変更 -->
+            <!-- 他の予約詳細をここに表示... -->
         </li>
-    </div>
-    {% endfor %}
-</ul>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div> <!-- コンテナ divのクローズ -->
 {% endblock %}
