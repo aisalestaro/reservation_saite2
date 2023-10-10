@@ -1,0 +1,15 @@
+<!-- templates/history.html -->
+{% extends "base.html" %}
+{% block content %}
+<h2>予約履歴</h2>
+<ul>
+    {% for reservation in reservations %}
+    <li>
+        <!-- ... 予約詳細表示 -->
+        <form action="{{ url_for('cancel', reservation_id=reservation.id) }}" method="post" style="display:inline;">
+            <input type="submit" value="キャンセル" onclick="if(!confirm('この予約をキャンセルしますか？')) return false">
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

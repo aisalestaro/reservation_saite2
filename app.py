@@ -1,74 +1,120 @@
-# db.config.pyからデータをインポートします
-from db_config import Reservation, db
 
-def select_action():
-    # ユーザーにアクションを選択させる
-    return input("番号を入力してください\n1:新しい予約 2:予約表示 3:予約キャンセル 0:終了>")
+import os
+from flask_login import current_user
+from flask import Flask, render_template, redirect, url_for, request, flash
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from peewee import IntegrityError
+from db_config import User, Reservation
+from flask_mail import Mail, Message  # メール通知のため
 
-def add_reservation():
-    # 新しい予約を追加する
-    guest_name = input("宿泊者氏名を入力してください>")
-    address = input("住所を入力してください>")
-    email = input("メールアドレスを入力してください>")
-    male_guests = int(input("男性の数を入力してください>"))
-    female_guests = int(input("女性の数を入力してください>"))
-    phone_number = input("電話番号を入力してください>")
-    reservation_date = input("宿泊日をYYYY-MM-DD形式で入力してください>")
-    number_of_stays = int(input("宿泊数を入力してください>"))
-    check_in_time = input("チェックイン時刻を入力してください>")
-    remarks = input("備考を入力してください>")
+app = Flask(__name__)  # appオブジェクトを作成
+app.secret_key = os.urandom(24)
 
-    # データベースに新しい予約を保存する
-    Reservation.create(
-        guest_name=guest_name,
-        address=address,
-        email=email,
-        male_guests=male_guests,
-        female_guests=female_guests,
-        phone_number=phone_number,
-        reservation_date=reservation_date,
-        number_of_stays=number_of_stays,
-        check_in_time=check_in_time,
-        remarks=remarks
+mail = Mail(app)  # ここにMailオブジェクトの初期化を移動
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@app.route("/reserve", methods=["GET", "POST"])
+@login_required
+def reserve():
+    if request.method == "POST":
+        check_in_date = request.form["check_in_date"]
+        check_out_date = request.form["check_out_date"]
+        # ... 在庫確認と予約処理
+        # メール通知
+        msg = Message("予約完了", recipients=[current_user.email])
+        msg.body = f"予約が完了しました。チェックイン日: {check_in_date}, チェックアウト日: {check_out_date}"
+        mail.send(msg)
+        return redirect(url_for("index"))
+    return render_template("reservation.html")
+
+@app.route("/history")
+@login_required
+def history():
+    reservations = Reservation.select().where(Reservation.user == current_user)
+    return render_template("history.html", reservations=reservations)
+
+
+app = Flask(__name__)
+app.secret_key = os.urandom(24)
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.get(id=int(user_id))
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return redirect(url_for("login"))
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST" and request.form["name"] and request.form['password'] and request.form["email"]:
+        if User.select().where(User.name == request.form["name"]).first():
+            flash("その名前はすでに使われています")
+            return redirect(request.url)
+
+        if User.select().where(User.email == request.form["email"]).first():
+            flash("そのメールアドレスはすでに使われています")
+            return redirect(request.url)
+
+        try:
+            user = User.create(
+                name=request.form["name"],
+                email=request.form["email"],
+                password=generate_password_hash(request.form["password"]),
+            )
+            login_user(user)
+            flash(f"ようこそ！ {user.name} さん")
+            return redirect(url_for("index"))
+        except IntegrityError:
+            flash("登録に失敗しました")
+    return render_template("register.html")
+
+
+# ログインフォームの表示・ログイン処理
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST" and request.form["email"] and request.form["password"]:
+        user = User.select().where(User.email == request.form["email"]).first()
+        if user is not None and check_password_hash(user.password, request.form["password"]):
+            login_user(user)
+            flash(f"ようこそ！ {user.name} さん")
+            return redirect(url_for("index"))
+        else:
+            flash("認証に失敗しました")
+    return render_template("login.html")
+
+
+# ログアウト処理
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("ログアウトしました！")
+    return redirect(url_for("index"))
+
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST" and current_user.is_authenticated:
+        Reservation.create(user=current_user, content=request.form["content"])  
+    messages = (
+        Reservation.select()
+        .order_by(Reservation.pub_date.desc(), Reservation.id.desc())
     )
-    print("予約の登録1に成功しました")
+    return render_template("index.html", messages=messages)
 
-def show_reservations():
-    # すべての予約を表示する
-    for reservation in Reservation.select():
-        print(f"予約ID: {reservation.id}, 宿泊者氏名: {reservation.guest_name}, 宿泊日: {reservation.reservation_date}")
-
-def cancel_reservation():
-    # 予約をキャンセルする
-    reservation_id = int(input("キャンセルする予約のIDを入力してください>"))
-    reservation = Reservation.get_or_none(Reservation.id == reservation_id)
-    if reservation is not None:
-        reservation.delete_instance()
-        print("予約のキャンセルに成功しました")
+@app.route("/reservations/<reservation_id>/delete/", methods=["POST"])
+@login_required
+def delete(reservation_id):
+    if Reservation.select().where((Reservation.id == reservation_id) & (Reservation.user == current_user.id)).first():
+        Reservation.delete_by_id(reservation_id)
     else:
-        print("指定された予約IDは存在しないため、キャンセルできませんでした")
-
-def main():
-    while True:
-        action = select_action()
-
-        if action == "1":
-            add_reservation()
-            continue
-
-        if action == "2":
-            show_reservations()
-            continue
-
-        if action == "3":
-            cancel_reservation()
-            continue
-
-        if action == "0":
-            print("終了します")
-            break
-
-        print("入力に誤りがありますので、もう一度最初からやり直してください")
+        flash("無効な操作です")
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
-    main()
+    app.run(host="127.0.0.1", port=8000, debug=True)
