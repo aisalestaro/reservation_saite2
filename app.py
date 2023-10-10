@@ -50,7 +50,8 @@ def reserve():
             check_and_update_inventory(check_in_date, check_out_date)
             # ...その他の予約処理
             # メール通知
-            msg = Message("予約完了", recipients=[current_user.email])
+            if current_user.is_authenticated is not None:
+                msg = Message("予約完了", recipients=[current_user.email])
             msg.body = f"予約が完了しました。チェックイン日: {check_in_date}, チェックアウト日: {check_out_date}"
             mail.send(msg)
             return redirect(url_for("index"))
@@ -123,7 +124,7 @@ def logout():
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    if request.method == "POST" and current_user.is_authenticated:
+    if request.method == "POST" and (current_user.is_authenticated is not None):
         # 予約情報を取得
         room_type = request.form["room_type"]
         check_in_date = request.form["check_in_date"]
@@ -176,3 +177,20 @@ def delete(reservation_id):
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug=True)
 
+
+# 予約ページを表示するためのルート
+@app.route('/reservation')
+@login_required  # ログインが必要
+def reservation():
+    return render_template('reservation.html')
+
+# 予約データを処理するためのルート
+@app.route('/reserve', methods=['POST'])
+@login_required  # ログインが必要
+def reserve():
+    # ここで予約データを処理
+    check_in_date = request.form.get('check_in_date')
+    check_out_date = request.form.get('check_out_date')
+    # データベースに保存などの処理を行う
+    # （デモなので何もしません）
+    return redirect(url_for('history'))  # 予約履歴ページにリダイレクト
