@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from db_config import User, Reservation, Inventory
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = "your_secret_key_here"
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -40,7 +40,7 @@ def reserve():
         check_out_date = datetime.strptime(request.form["check_out_date"], '%Y-%m-%d').date()
         try:
             check_and_update_inventory(check_in_date, check_out_date)
-            # ...その他の予約処理を入れる
+            # TODO: その他の予約処理をここに実装
             return redirect(url_for("index"))
         except ValueError as e:
             flash(str(e))
@@ -169,3 +169,33 @@ def delete(reservation_id):
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug=True)
+
+@app.route('/reservation')
+def reservation():
+    # NOTE: The below part is a placeholder code and needs to be adjusted according to the actual authentication and user information.
+    
+    # Check if the user is logged in (using flask_login's current_user)
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))  # Redirect to index.html
+    
+    # Check if the user is registered but not logged in
+    elif user_is_registered_but_not_logged_in:  # This variable needs to be defined in the actual code.
+        return redirect(url_for('login'))  # Redirect to login.html
+    
+    # If the user is not registered
+    else:
+        return redirect(url_for('register'))  # Redirect to register.html
+
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
+
+
+
+@app.route('/')
+def root():
+    return redirect(url_for('home'))

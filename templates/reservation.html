@@ -3,7 +3,6 @@
 {% block content %}
 <!-- Include jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
 <!-- Custom JavaScript -->
 <script>
     $(document).ready(function () {
@@ -28,36 +27,143 @@
         });
     });
 </script>
-
 <div class="container">
     {% if current_user.is_authenticated %}
     <h2 class="my-4">予約はこちら（reservation）</h2>
-    <form action="{{ url_for('index') }}" method="post">
-        <div class="form-group">
-            <label for="お部屋タイプ（room type）">お部屋タイプ（room type）</label>
-            <select name="room_type" id="room_type" class="form-control">
-                <option value="double_room">ダブルルーム（Double Room）</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="チェックイン希望日（check_in_date）">チェックイン希望日（Check-in Date）</label>
-            <input type="date" name="check_in_date" id="check_in_date" class="form-control" required>
-        </div>
-        <div class="form-group">
-            <label for="チェックアウト希望日（check_out_date）">チェックアウト希望日（Check-out Date）</label>
-            <input type="date" name="check_out_date" id="check_out_date" class="form-control" required>
-        </div>
-
-        <div class="form-group">
-            <span id="number_of_nights"></span>
-        </div>
-        <div class="form-group">
-            <span id="availability"></span>
-        </div>
-        <div class="form-group">
-            <input type="submit" value="予約へ進む（Reserve）" class="btn btn-primary">
-        </div>
-    </form>
+<form action="{{ url_for('index') }}" method="post">
+<div class="form-group">
+<label for="お部屋タイプ（room type）">お部屋タイプ（room type）</label>
+<select class="form-control" id="room_type" name="room_type">
+<option value="double_room">ダブルルーム（Double Room）</option>
+</select>
+</div>
+<div class="form-group">
+<label for="チェックイン希望日（check_in_date）">チェックイン希望日（Check-in Date）</label>
+<input class="form-control" id="check_in_date" name="check_in_date" required="" type="date"/>
+</div>
+<div class="form-group">
+<label for="チェックアウト希望日（check_out_date）">チェックアウト希望日（Check-out Date）</label>
+<input class="form-control" id="check_out_date" name="check_out_date" required="" type="date"/>
+</div>
+<div class="form-group">
+<span id="number_of_nights"></span>
+</div>
+<div class="form-group">
+<span id="availability"></span>
+</div>
+<div class="form-group">
+<input class="btn btn-primary" type="submit" value="予約へ進む（Reserve）"/>
+</div>
+</form>
     {% endif %}
 </div>
-{% endblock %}
+{% endblock %}<html><head>
+<title>コンテナホテル</title>
+<!-- コンテナホテルの情報セクション -->
+<!-- ホテルからのお知らせセクション -->
+<!-- 客室セクション -->
+<!-- ホテル基本情報セクション -->
+<!-- 館内設備・サービスセクション -->
+<!-- 交通案内セクション -->
+<!-- Googleマップの埋め込みコードをここに追加する -->
+<!-- 固定予約ボタン -->
+<style>
+    /* ホテルのイメージが横に並ぶようにする */
+    .hotel-images img {
+        width: 33%;
+    }
+</style><style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .section-title {
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .section-content {
+            padding: 10px;
+        }
+    </style><style>
+    /* ボディ全体の背景色とテキスト色 */
+    body {
+        background-color: #f2f2f2;
+        color: #333;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* コンテナ */
+    .container {
+        width: 80%;
+        margin: auto;
+        overflow: hidden;
+    }
+
+    /* セクションタイトルのスタイル */
+    .section-title {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    .section-title h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 24px;
+    }
+
+    /* セクションコンテンツのスタイル */
+    .section-content {
+        background: #fff;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 2px 2px 12px #aaa;
+        border-radius: 8px;
+    }
+
+    /* Googleマップのスタイル */
+    iframe {
+        width: 100%;
+        border-radius: 8px;
+    }
+</style><style>
+    /* 予約ボタンのスタイル */
+    .reserve-button {
+        background-color: red;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style><style>
+    /* ホテルのイメージが横に並ぶようにする */
+    #slideshow {
+        display: flex;
+        justify-content: space-between;
+    }
+</style><style>
+    /* 固定ボタンのスタイル */
+    .fixed-reserve-button {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: red;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        z-index: 1000;
+    }
+</style></head></html>

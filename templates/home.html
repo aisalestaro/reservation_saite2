@@ -1,0 +1,205 @@
+
+<style>
+    /* ホテルのイメージが横に並ぶようにする */
+    .hotel-images img {
+        width: 33%;
+    }
+</style>
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<title>コンテナホテル</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .section-title {
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .section-content {
+            padding: 10px;
+        }
+    </style>
+<style>
+    /* ボディ全体の背景色とテキスト色 */
+    body {
+        background-color: #f2f2f2;
+        color: #333;
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* コンテナ */
+    .container {
+        width: 80%;
+        margin: auto;
+        overflow: hidden;
+    }
+
+    /* セクションタイトルのスタイル */
+    .section-title {
+        background-color: #333;
+        color: #fff;
+        padding: 10px 0;
+        text-align: center;
+    }
+
+    .section-title h1 {
+        margin: 0;
+        padding: 0;
+        font-size: 24px;
+    }
+
+    /* セクションコンテンツのスタイル */
+    .section-content {
+        background: #fff;
+        padding: 20px;
+        margin: 20px 0;
+        box-shadow: 2px 2px 12px #aaa;
+        border-radius: 8px;
+    }
+
+    /* Googleマップのスタイル */
+    iframe {
+        width: 100%;
+        border-radius: 8px;
+    }
+</style>
+<style>
+    /* 予約ボタンのスタイル */
+    .reserve-button {
+        background-color: red;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+</style>
+<style>
+    /* ホテルのイメージが横に並ぶようにする */
+    #slideshow {
+        display: flex;
+        justify-content: space-between;
+    }
+</style>
+<!-- コンテナホテルの情報セクション -->
+<div class="section-title">
+<h1>コンテナホテル</h1>
+</div>
+<div class="section-content">
+<p>場所: 八幡平市大更</p>
+<p>全15室</p>
+<p>東北自動車道 松尾八幡平 (盛岡から40分)</p>
+<p>焼き走り溶岩流や松川温泉、冬はスキーなど、レジャー・ショッピングにも最適。</p>
+<p>ホテル付近には癒しの天然温泉がございますので、一日の疲れをリフレッシュできます。</p>
+</div>
+<!-- ホテルからのお知らせセクション -->
+<div class="section-title">
+<h2>ホテルイメージ</h2>
+</div>
+<div class="section-content">
+<div>
+<h3>フロント</h3>
+<img alt="フロントの写真" src="front.jpg"/>
+<p>自動チェック・精算機導入でスムーズに受付。周辺エリアの観光情報も案内しています。</p>
+</div>
+<div>
+<h3>無料軽食コーナー</h3>
+<img alt="無料軽食コーナーの写真" src="snacks.jpg"/>
+<p>客室の電子レンジで温めてお召し上がりいただけます。軽食とドリンクの内容は画像と異なる場合がございます。</p>
+</div>
+<div>
+<h3>コインランドリー</h3>
+<img alt="コインランドリーの写真" src="laundry.jpg"/>
+<p>専用コンテナにコインランドリーを設置しております（2台/有料）。6時〜24時までの間ご利用いただけます。</p>
+</div>
+<div>
+<h3>自動販売機</h3>
+<img alt="自動販売機の写真" src="vending.jpg"/>
+<p>専用コンテナに自動販売機を設置しております。</p>
+</div>
+<div>
+<h3>駐車場</h3>
+<img alt="駐車場" src="parking.jpg"/>
+<p>客室の側に駐車いただける無料専用駐車場がございます（全34台）。</p>
+</div>
+</div>
+<!-- 客室セクション -->
+<div class="section-title">
+<h2>客室</h2>
+</div>
+<div class="section-content">
+<div>
+<h3>ダブルルーム</h3>
+<p>全室禁煙</p>
+<p>Wi-Fi完備</p>
+<p>全15室</p>
+<p>2名</p>
+<p>13㎡</p>
+<p>W140cm×L195cm ×1台</p>
+<p>料金 1名 6,200円／泊〜 2名 8,700円／泊〜</p>
+<p>付帯設備 ユニットバス、冷凍冷蔵庫、電子レンジ、加湿空気清浄機</p>
+<p>W140×L195サイズのシモンズ製ダブルベッドに加え、デスクとチェアを全室装備。</p>
+</div>
+</div>
+<!-- ホテル基本情報セクション -->
+<div class="section-title">
+<h2>ホテル基本情報</h2>
+</div>
+<div class="section-content">
+<p>住所: 八幡平市大更</p>
+<p>電話番号: 012-3456-7890</p>
+<p>チェックイン・アウト時間: チェックイン 15:00／チェックアウト 10:00</p>
+<p>支払い方法（現地）: 現金, クレジットカード（VISA／JCB／Diners Club／American Express／MasterCard）</p>
+<p>支払い方法（オンライン事前決済）: クレジットカード（VISA／JCB／Diners Club／American Express／MasterCard）</p>
+</div>
+<!-- 館内設備・サービスセクション -->
+<div class="section-title">
+<h2>館内設備・サービス</h2>
+</div>
+<div class="section-content">
+<p>【駐車場】普通車 15台（無料）</p>
+<p>【客室】 ユニットバス, トイレ, テレビ, ドライヤー, 冷凍冷蔵庫, 電子レンジ, 電子ポット, 加湿空気清浄機</p>
+<p>【共有】 コインランドリー, 自動販売機, 無料コーヒーコーナー, 無料軽食コーナー（客室の電子レンジで温めてお召し上がりいただけます。）, 館内では、無料Wi-Fiをご利用いただけます。</p>
+<p>【アメニティ】 【無料】 シャンプー, コンディショナー, ボディソープ, ハンドソープ, ナイトウェア（ガウン）, ボディタオル, 歯ブラシ, ヘアブラシ, T字カミソリ ※詳細はフロントスタッフへお尋ねください。
+        </p>
+</div>
+<!-- 交通案内セクション -->
+<!-- Googleマップの埋め込みコードをここに追加する -->
+<div class="section-title">
+<h1>交通案内</h1>
+</div>
+<div class="section-content">
+<!-- Googleマップの埋め込み -->
+<iframe height="450" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3024.388711284935!2d140.8258594154342!3d39.96850197942371!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x5f9d4b68c0f0e8a3%3A0x11ef3a6c6a8e3f5f!2z5rW35rK86aeF!5e0!3m2!1sja!2sjp!4v1634012923246!5m2!1sja!2sjp" width="600"></iframe>
+</div>
+<style>
+    /* 固定ボタンのスタイル */
+    .fixed-reserve-button {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: red;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: pointer;
+        z-index: 1000;
+    }
+</style>
+<!-- 固定予約ボタン -->
+<a href="reservation.html"><button class="fixed-reserve-button">このホテルを予約する</button></a>
+</head></html>
