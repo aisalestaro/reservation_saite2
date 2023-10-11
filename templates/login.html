@@ -5,10 +5,10 @@
 <p class=error><strong>Error:</strong> {{ message }}</p>
 {% endfor %}
 <form action="{{ url_for('login') }}" method="post">
-    <div>Email:</div>
+    <div>メール（Email）</div>
     <input type="email" name="email" required>
-    <div>Password:</div>
+    <div>パスワード（Password）</div>
     <input type="password" name="password" required>
-    <input type="submit" value="Log In">
+    <input type="submit" value="ログイン（Log In）">
 </form>
 {% endblock %}

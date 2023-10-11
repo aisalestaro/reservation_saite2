@@ -113,13 +113,13 @@ def index():
             check_in_date = request.form["check_in_date"]
             check_out_date = request.form["check_out_date"]
             male_guests = request.form.get("male_guests", 0)
-            female_guests = request.form["female_guests"]
-            guest_name = request.form["guest_name"]
-            address = request.form["address"]
-            email = request.form["email"]
-            phone_number = request.form["phone_number"]
-            check_in_time = request.form["check_in_time"]
-            remarks = request.form["remarks"]
+            female_guests = request.form.get("female_guests", 0)
+            guest_name = request.form.get("guest_name", "デフォルト値")
+            address = request.form.get("address", "デフォルト値")
+            email = request.form.get("email", "デフォルト値")
+            phone_number = request.form.get("phone_number", "デフォルト値")
+            check_in_time = request.form.get("pcheck_in_time", "デフォルト値")
+            remarks = request.form.get("remarks", "デフォルト値")
 
             # 何泊かを計算
             number_of_stays = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
