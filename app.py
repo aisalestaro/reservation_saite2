@@ -1,10 +1,9 @@
-# app.pyファイル
 import os
 from flask import Flask, render_template, redirect, url_for, request, flash
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from peewee import IntegrityError
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta
 from db_config import User, Reservation, Inventory
 
 app = Flask(__name__)
@@ -41,7 +40,7 @@ def reserve():
         check_out_date = datetime.strptime(request.form["check_out_date"], '%Y-%m-%d').date()
         try:
             check_and_update_inventory(check_in_date, check_out_date)
-            # ...その他の予約処理
+            # ...その他の予約処理を入れる
             return redirect(url_for("index"))
         except ValueError as e:
             flash(str(e))
@@ -104,29 +103,49 @@ def logout():
     flash("ログアウトしました！")
     return redirect(url_for("index"))
 
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST" and (current_user.is_authenticated is not None):
-        # 予約情報を取得
-        room_type = request.form["room_type"]
-        check_in_date = request.form["check_in_date"]
-        check_out_date = request.form["check_out_date"]
-        # その他の予約情報を取得...
+        try:
+            # 予約情報を取得
+            room_type = request.form["room_type"]
+            check_in_date = request.form["check_in_date"]
+            check_out_date = request.form["check_out_date"]
+            male_guests = request.form.get("male_guests", 0)
+            female_guests = request.form["female_guests"]
+            guest_name = request.form["guest_name"]
+            address = request.form["address"]
+            email = request.form["email"]
+            phone_number = request.form["phone_number"]
+            check_in_time = request.form["check_in_time"]
+            remarks = request.form["remarks"]
 
-        # 何泊かを計算
-        number_of_stays = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
+            # 何泊かを計算
+            number_of_stays = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
 
-        # 新しい予約をデータベースに保存
-        reservation = Reservation.create(
-            user=current_user,
-            room_type=room_type,
-            check_in_date=check_in_date,
-            check_out_date=check_out_date,
-            number_of_stays=number_of_stays,
-            # その他の予約情報...
-        )
+            # 新しい予約をデータベースに保存
+            reservation = Reservation.create(
+                user=current_user.id,
+                room_type=room_type,
+                check_in_date=check_in_date,
+                check_out_date=check_out_date,
+                number_of_stays=number_of_stays,
+                male_guests=int(male_guests),
+                female_guests=int(female_guests),
+                guest_name=guest_name,
+                address=address,
+                email=email,
+                phone_number=phone_number,
+                check_in_time=check_in_time,
+                remarks=remarks,
+                pub_date=datetime.now()  # 今の日時を保存
+            )
 
-        flash("予約が完了しました!")
+            flash("予約が完了しました!")
+        except IntegrityError as e:
+            flash(f"予約に失敗しました: {e}")
+
         return redirect(url_for("index"))
 
     # 予約履歴を取得
@@ -135,7 +154,9 @@ def index():
         .where(Reservation.user == current_user)
         .order_by(Reservation.check_in_date.desc())
     )
+    
     return render_template("index.html", reservations=reservations)
+
 
 @app.route("/reservations/<reservation_id>/delete/", methods=["POST"])
 @login_required

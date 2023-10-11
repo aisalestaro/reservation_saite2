@@ -1,18 +1,16 @@
 {% extends "base.html" %}
 
 {% block content %}
-<!-- Bootstrap CSSのリンクを追加 -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
 
-<div class="container"> <!-- コンテナ divを追加 -->
-    {% if current_user.is_authenticated %} {# ログインしている場合に表示 #}
-    <h2 class="my-4">お部屋の予約 〜Reservation〜</h2> <!-- タイトルを変更 -->
+<div class="container">
+    {% if current_user.is_authenticated %}
+    <h2 class="my-4">お部屋の予約 〜Reservation〜</h2>
     <form action="{{ url_for('index') }}" method="post">
         <div class="form-group">
             <label for="room_type">客室タイプ:</label>
             <select name="room_type" id="room_type" class="form-control">
                 <option value="double_room">ダブルルーム</option>
-                <!-- 他の部屋タイプオプションをここに追加... -->
             </select>
         </div>
         <div class="form-group">
@@ -23,22 +21,56 @@
             <label for="check_out_date">チェックアウト日:</label>
             <input type="date" name="check_out_date" id="check_out_date" class="form-control" required>
         </div>
-        <!-- 他の予約情報フィールドをここに追加... -->
         <div class="form-group">
-            <input type="submit" value="予約" class="btn btn-primary"> <!-- Bootstrapボタンクラスを追加 -->
+            <label for="number_of_stays">泊数:</label>
+            <input type="number" name="number_of_stays" id="number_of_stays" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="guest_name">宿泊者名:</label>
+            <input type="text" name="guest_name" id="guest_name" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="address">住所:</label>
+            <textarea name="address" id="address" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="email">メール:</label>
+            <input type="email" name="email" id="email" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="male_guests">男性ゲスト数:</label>
+            <input type="number" name="male_guests" id="male_guests" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="female_guests">女性ゲスト数:</label>
+            <input type="number" name="female_guests" id="female_guests" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="phone_number">電話番号:</label>
+            <input type="text" name="phone_number" id="phone_number" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="check_in_time">チェックイン時間:</label>
+            <input type="text" name="check_in_time" id="check_in_time" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="remarks">備考:</label>
+            <textarea name="remarks" id="remarks" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="予約" class="btn btn-primary">
         </div>
     </form>
 
-    <h2 class="my-4">予約履歴</h2> <!-- タイトルを変更 -->
-    <ul class="list-group"> <!-- Bootstrapリストグループクラスを追加 -->
+    <h2 class="my-4">予約履歴</h2>
+    <ul class="list-group">
         {% for reservation in reservations %}
         <li class="list-group-item">
             {{ reservation.room_type }} - {{ reservation.check_in_date }} to {{ reservation.check_out_date }} ({{
-            reservation.number_of_stays }}泊) <!-- 泊数の表記を日本語に変更 -->
-            <!-- 他の予約詳細をここに表示... -->
+            reservation.number_of_stays }}泊)
         </li>
         {% endfor %}
     </ul>
     {% endif %}
-</div> <!-- コンテナ divのクローズ -->
+</div>
 {% endblock %}
