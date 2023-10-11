@@ -1,13 +1,64 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2>予約</h2>
-<form action="{{ url_for('reserve') }}" method="post">
+<!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+<!-- Custom JavaScript -->
+<script>
+    $(document).ready(function () {
+        // When either date input changes
+        $("#check_in_date, #check_out_date").change(function () {
+            var checkInDate = new Date($("#check_in_date").val());
+            var checkOutDate = new Date($("#check_out_date").val());
 
-    <div>チェックイン日:</div>
-    <input type="date" name="check_in_date" required>
-    <div>チェックアウト日:</div>
-    <input type="date" name="check_out_date" required>
-    <input type="submit" value="予約">
-</form>
+            // Calculate the number of nights
+            var timeDifference = checkOutDate.getTime() - checkInDate.getTime();
+            var numberOfNights = timeDifference / (1000 * 3600 * 24);
+
+            // Display the number of nights
+            $("#number_of_nights").text("Number of nights: " + numberOfNights);
+
+            // Check availability (Here, it's a demo. In a real application, you'll check with the server.)
+            if (numberOfNights > 0 && numberOfNights <= 5) {
+                $("#availability").text("予約可能（Available）").css("color", "green");
+            } else {
+                $("#availability").text("予約不可（Not Available）").css("color", "red");
+            }
+        });
+    });
+</script>
+
+<div class="container">
+    {% if current_user.is_authenticated %}
+    <h2 class="my-4">予約はこちら（reservation）</h2>
+    <form action="{{ url_for('index') }}" method="post">
+        <div class="form-group">
+            <label for="お部屋タイプ（room type）">お部屋タイプ（room type）</label>
+            <select name="room_type" id="room_type" class="form-control">
+                <option value="double_room">ダブルルーム（Double Room）</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="チェックイン希望日（check_in_date）">チェックイン希望日（Check-in Date）</label>
+            <input type="date" name="check_in_date" id="check_in_date" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="チェックアウト希望日（check_out_date）">チェックアウト希望日（Check-out Date）</label>
+            <input type="date" name="check_out_date" id="check_out_date" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <span id="number_of_nights"></span>
+        </div>
+        <div class="form-group">
+            <span id="availability"></span>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="予約へ進む（Reserve）" class="btn btn-primary">
+        </div>
+    </form>
+    <a href="{{ url_for('index') }}">Go to Index</a>
+    {% endif %}
+</div>
 {% endblock %}
