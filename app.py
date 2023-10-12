@@ -91,19 +91,19 @@ def login():
         if user is not None and check_password_hash(user.password, request.form["password"]):
             login_user(user)
             flash(f"ようこそ！ {user.name} さん")
-            return redirect(url_for("reservation"))
+            return redirect(url_for("reserve"))
         else:
             flash("認証に失敗しました: Emailまたはパスワードが間違っています")
     return render_template("login.html")
 
-@app.route("/logout.html")
+@app.route("/logout")
 @login_required
 def logout():
     logout_user()
     flash("ログアウトしました！")
     return redirect(url_for("index"))
 
-@app.route("/index.html", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 def index():
     if request.method == "POST" and (current_user.is_authenticated is not None):
         try:
@@ -142,7 +142,7 @@ def index():
         except IntegrityError as e:
             flash(f"予約に失敗しました: {e}")
 
-        return redirect(url_for("index"))
+        return render_template('index.html')
 
     reservations = (
         Reservation.select()
@@ -150,7 +150,7 @@ def index():
         .order_by(Reservation.check_in_date.desc())
     )
 
-    return render_template("index.html", reservations=reservations)
+    return render_template("index", reservations=reservations)
 
 @app.route("/reservations/<reservation_id>/delete/", methods=["POST"])
 @login_required

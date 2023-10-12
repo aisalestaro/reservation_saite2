@@ -1,32 +1,15 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>ログイン</h2>
-{% for message in get_flashed_messages() %}
-<p class="error"><strong>Error:</strong> {{ message }}</p>
-{% endfor %}
-<form action="{{ url_for('login') }}" method="post">
-<div>メール（Email）</div>
-<input name="email" required="" type="email"/>
-<div>パスワード（Password）</div>
-<input name="password" required="" type="password"/>
-<input type="submit" value="ログイン（Log In）"/>
-</form>
-{% endblock %}<html><head>
-<title>コンテナホテル</title>
-<!-- コンテナホテルの情報セクション -->
-<!-- ホテルからのお知らせセクション -->
-<!-- 客室セクション -->
-<!-- ホテル基本情報セクション -->
-<!-- 館内設備・サービスセクション -->
-<!-- 交通案内セクション -->
-<!-- Googleマップの埋め込みコードをここに追加する -->
-<!-- 固定予約ボタン -->
-<style>
-    /* ホテルのイメージが横に並ぶようにする */
-    .hotel-images img {
-        width: 33%;
-    }
-</style><style>
+<!DOCTYPE html>
+
+<html lang="ja">
+
+<head>
+    <title>コンテナホテル</title>
+    <style>
+        .hotel-images img {
+            width: 33%;
+        }
+    </style>
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -41,83 +24,116 @@
         .section-content {
             padding: 10px;
         }
-    </style><style>
-    /* ボディ全体の背景色とテキスト色 */
-    body {
-        background-color: #f2f2f2;
-        color: #333;
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        margin: 0;
-        padding: 0;
-    }
+    </style>
+    <style>
+        /* ボディ全体の背景色とテキスト色 */
+        body {
+            background-color: #f2f2f2;
+            color: #333;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
 
-    /* コンテナ */
-    .container {
-        width: 80%;
-        margin: auto;
-        overflow: hidden;
-    }
+        /* コンテナ */
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
 
-    /* セクションタイトルのスタイル */
-    .section-title {
-        background-color: #333;
-        color: #fff;
-        padding: 10px 0;
-        text-align: center;
-    }
+        /* セクションタイトルのスタイル */
+        .section-title {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 0;
+            text-align: center;
+        }
 
-    .section-title h1 {
-        margin: 0;
-        padding: 0;
-        font-size: 24px;
-    }
+        .section-title h1 {
+            margin: 0;
+            padding: 0;
+            font-size: 24px;
+        }
 
-    /* セクションコンテンツのスタイル */
-    .section-content {
-        background: #fff;
-        padding: 20px;
-        margin: 20px 0;
-        box-shadow: 2px 2px 12px #aaa;
-        border-radius: 8px;
-    }
+        /* セクションコンテンツのスタイル */
+        .section-content {
+            background: #fff;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 2px 2px 12px #aaa;
+            border-radius: 8px;
+        }
 
-    /* Googleマップのスタイル */
-    iframe {
-        width: 100%;
-        border-radius: 8px;
-    }
-</style><style>
-    /* 予約ボタンのスタイル */
-    .reserve-button {
-        background-color: red;
-        color: white;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-    }
-</style><style>
-    /* ホテルのイメージが横に並ぶようにする */
-    #slideshow {
-        display: flex;
-        justify-content: space-between;
-    }
-</style><style>
-    /* 固定ボタンのスタイル */
-    .fixed-reserve-button {
-        position: fixed;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: red;
-        color: white;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        cursor: pointer;
-        z-index: 1000;
-    }
-</style></head></html>
+        /* Googleマップのスタイル */
+        iframe {
+            width: 100%;
+            border-radius: 8px;
+        }
+    </style>
+    <style>
+        /* 予約ボタンのスタイル */
+        .reserve-button {
+            background-color: red;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+    <style>
+        /* ホテルのイメージが横に並ぶようにする */
+        #slideshow {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+    <style>
+        /* 固定ボタンのスタイル */
+        .fixed-reserve-button {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: red;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <h1><a href="{{ url_for('index') }}"></a></h1>
+        <div class="metanav">
+            {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('login') }}">ログイン（LogIn）</a>
+            <a href="{{ url_for('register') }}">新規登録（Register）</a>
+            {% else %}
+            <a href="{{ url_for('logout') }}"></a>
+            {% endif %}
+        </div>
+        <div class="flash"></div>
+
+
+        <h2>ログイン（log in）</h2>
+        {% if error %}{% endif %}
+        <form action="{{ url_for('login') }}" method="post">
+            <div>Email:</div>
+            <input name="email" type="email" />
+            <div>Password:</div>
+            <input name="password" type="password" />
+            <input type="submit" value="Login" />
+        </form>
+    </div>
+</body>
+
+</html>
