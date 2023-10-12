@@ -1,74 +1,86 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
-<div class="container">
-    {% if current_user.is_authenticated %}
-    <h2 class="my-4">お部屋の予約 〜Reservation〜</h2>
-    <form action="{{ url_for('index') }}" method="post">
-        <div class="form-group">
-            <label for="room_type">客室タイプ:</label>
-            <select class="form-control" id="room_type" name="room_type">
-                <option value="double_room">ダブルルーム</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="check_in_date">チェックイン日:</label>
-            <input class="form-control" id="check_in_date" name="check_in_date" required="" type="date" />
-        </div>
-        <div class="form-group">
-            <label for="check_out_date">チェックアウト日:</label>
-            <input class="form-control" id="check_out_date" name="check_out_date" required="" type="date" />
-        </div>
-        <div class="form-group">
-            <label for="number_of_stays">泊数:</label>
-            <input class="form-control" id="number_of_stays" name="number_of_stays" type="number" />
-        </div>
-        <div class="form-group">
-            <label for="guest_name">宿泊者名:</label>
-            <input class="form-control" id="guest_name" name="guest_name" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="address">住所:</label>
-            <textarea class="form-control" id="address" name="address"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="email">メール:</label>
-            <input class="form-control" id="email" name="email" type="email" />
-        </div>
-        <div class="form-group">
-            <label for="male_guests">男性ゲスト数:</label>
-            <input class="form-control" id="male_guests" name="male_guests" type="number" />
-        </div>
-        <div class="form-group">
-            <label for="female_guests">女性ゲスト数:</label>
-            <input class="form-control" id="female_guests" name="female_guests" type="number" />
-        </div>
-        <div class="form-group">
-            <label for="phone_number">電話番号:</label>
-            <input class="form-control" id="phone_number" name="phone_number" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="check_in_time">チェックイン時間:</label>
-            <input class="form-control" id="check_in_time" name="check_in_time" type="text" />
-        </div>
-        <div class="form-group">
-            <label for="remarks">備考:</label>
-            <textarea class="form-control" id="remarks" name="remarks"></textarea>
-        </div>
-        <div class="form-group">
-            <input class="btn btn-primary" type="submit" value="予約" />
-        </div>
-    </form>
-    <h2 class="my-4">予約履歴</h2>
-    <ul class="list-group">
-        {% for reservation in reservations %}
-        <li class="list-group-item">
-            {{ reservation.room_type }} - {{ reservation.check_in_date }} to {{ reservation.check_out_date }} ({{
-            reservation.number_of_stays }}泊)
-        </li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-</div>
-{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>Index Page</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container">
+        {% if current_user.is_authenticated %}
+        <h2 class="my-4">お部屋の予約 〜Reservation〜</h2>
+        <form action="{{ url_for('index') }}" method="post">
+            <div class="form-group">
+                <label for="room_type">客室タイプ:</label>
+                <select class="form-control" id="room_type" name="room_type">
+                    <option value="double_room">ダブルルーム</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="check_in_date">チェックイン日:</label>
+                <input class="form-control" id="check_in_date" name="check_in_date" required="" type="date" />
+            </div>
+            <div class="form-group">
+                <label for="check_out_date">チェックアウト日:</label>
+                <input class="form-control" id="check_out_date" name="check_out_date" required="" type="date" />
+            </div>
+            <div class="form-group">
+                <label for="number_of_stays">泊数:</label>
+                <input class="form-control" id="number_of_stays" name="number_of_stays" type="number" />
+            </div>
+            <div class="form-group">
+                <label for="guest_name">宿泊者名:</label>
+                <input class="form-control" id="guest_name" name="guest_name" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="address">住所:</label>
+                <textarea class="form-control" id="address" name="address"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="email">メール:</label>
+                <input class="form-control" id="email" name="email" type="email" />
+            </div>
+            <div class="form-group">
+                <label for="male_guests">男性ゲスト数:</label>
+                <input class="form-control" id="male_guests" name="male_guests" type="number" />
+            </div>
+            <div class="form-group">
+                <label for="female_guests">女性ゲスト数:</label>
+                <input class="form-control" id="female_guests" name="female_guests" type="number" />
+            </div>
+            <div class="form-group">
+                <label for="phone_number">電話番号:</label>
+                <input class="form-control" id="phone_number" name="phone_number" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="check_in_time">チェックイン時間:</label>
+                <input class="form-control" id="check_in_time" name="check_in_time" type="text" />
+            </div>
+            <div class="form-group">
+                <label for="remarks">備考:</label>
+                <textarea class="form-control" id="remarks" name="remarks"></textarea>
+            </div>
+            <div class="form-group">
+                <input class="btn btn-primary" type="submit" value="予約" />
+            </div>
+        </form>
+        <h2 class="my-4">予約履歴</h2>
+        <ul class="list-group">
+            {% for reservation in reservations %}
+            <li class="list-group-item">
+                {{ reservation.room_type }} - {{ reservation.check_in_date }} to {{ reservation.check_out_date }} ({{
+                reservation.number_of_stays }}泊)
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endblock %}
+</body>
+
+</html>
