@@ -27,12 +27,13 @@ def check_and_update_inventory(check_in_date, check_out_date):
         else:
             raise ValueError(f"No rooms available on {inventory.date}")
 
-@app.route("/reservation")
-@login_required
-def reservation():
-    return render_template("reservation.html")
+@app.route('/')
+def root():
+    return render_template('home.html')
+    return redirect(url_for('home.html'))
 
-@app.route("/reserve", methods=["GET", "POST"])
+
+@app.route("/reservation", methods=["GET", "POST"])
 @login_required
 def reserve():
     if request.method == "POST":
@@ -40,13 +41,12 @@ def reserve():
         check_out_date = datetime.strptime(request.form["check_out_date"], '%Y-%m-%d').date()
         try:
             check_and_update_inventory(check_in_date, check_out_date)
-            # TODO: その他の予約処理をここに実装
             return redirect(url_for("index"))
         except ValueError as e:
             flash(str(e))
     return render_template("reservation.html")
 
-@app.route("/history")
+@app.route("/history.html")
 @login_required
 def history():
     reservations = Reservation.select().where(Reservation.user == current_user)
@@ -60,7 +60,7 @@ def load_user(user_id):
 def unauthorized_handler():
     return redirect(url_for("login"))
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route("/register.html", methods=["GET", "POST"])
 def register():
     if request.method == "POST" and request.form["name"] and request.form['password'] and request.form["email"]:
         if User.select().where(User.name == request.form["name"]).first():
@@ -96,19 +96,17 @@ def login():
             flash("認証に失敗しました: Emailまたはパスワードが間違っています")
     return render_template("login.html")
 
-@app.route("/logout")
+@app.route("/logout.html")
 @login_required
 def logout():
     logout_user()
     flash("ログアウトしました！")
     return redirect(url_for("index"))
 
-
-@app.route("/", methods=["GET", "POST"])
+@app.route("/index.html", methods=["GET", "POST"])
 def index():
     if request.method == "POST" and (current_user.is_authenticated is not None):
         try:
-            # 予約情報を取得
             room_type = request.form["room_type"]
             check_in_date = request.form["check_in_date"]
             check_out_date = request.form["check_out_date"]
@@ -121,10 +119,8 @@ def index():
             check_in_time = request.form.get("pcheck_in_time", "デフォルト値")
             remarks = request.form.get("remarks", "デフォルト値")
 
-            # 何泊かを計算
             number_of_stays = (datetime.strptime(check_out_date, '%Y-%m-%d') - datetime.strptime(check_in_date, '%Y-%m-%d')).days
 
-            # 新しい予約をデータベースに保存
             reservation = Reservation.create(
                 user=current_user.id,
                 room_type=room_type,
@@ -139,7 +135,7 @@ def index():
                 phone_number=phone_number,
                 check_in_time=check_in_time,
                 remarks=remarks,
-                pub_date=datetime.now()  # 今の日時を保存
+                pub_date=datetime.now()
             )
 
             flash("予約が完了しました!")
@@ -148,15 +144,13 @@ def index():
 
         return redirect(url_for("index"))
 
-    # 予約履歴を取得
     reservations = (
         Reservation.select()
         .where(Reservation.user == current_user)
         .order_by(Reservation.check_in_date.desc())
     )
-    
-    return render_template("index.html", reservations=reservations)
 
+    return render_template("index.html", reservations=reservations)
 
 @app.route("/reservations/<reservation_id>/delete/", methods=["POST"])
 @login_required
@@ -167,35 +161,7 @@ def delete(reservation_id):
         flash("無効な操作です")
     return redirect(url_for("index"))
 
+
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=8000, debug=True)
 
-@app.route('/reservation')
-def reservation():
-    # NOTE: The below part is a placeholder code and needs to be adjusted according to the actual authentication and user information.
-    
-    # Check if the user is logged in (using flask_login's current_user)
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))  # Redirect to index.html
-    
-    # Check if the user is registered but not logged in
-    elif user_is_registered_but_not_logged_in:  # This variable needs to be defined in the actual code.
-        return redirect(url_for('login'))  # Redirect to login.html
-    
-    # If the user is not registered
-    else:
-        return redirect(url_for('register'))  # Redirect to register.html
-
-@app.route('/index')
-def index():
-    return render_template('index.html')
-
-@app.route('/home')
-def home():
-    return render_template('home.html')
-
-
-
-@app.route('/')
-def root():
-    return redirect(url_for('home'))
